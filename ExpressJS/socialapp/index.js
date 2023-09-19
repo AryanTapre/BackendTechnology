@@ -4,11 +4,25 @@ const format = require('date-format');
 const app = express();
 const PORT = 4000 || process.env.PORT;
 
+//TODO: swagger related
+const swaggerUI = require('swagger-ui-express');  // npm 
+const fs = require('fs');
+const YAMl = require('yaml');   // using yaml file for documentation..
+
+const file = fs.readFileSync('./swagger.yaml','utf-8');
+const swaggerDocument = YAMl.parse(file);
+
+app.use('/socialapp-api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDocument));
+
+
+
+
 //FIXME: Defining the ROUTE for SocialApp
 
 app.get("/",(request,response) => {
     //response.send("<h1> Hello from FrontMan</h1>");
     response.status(200).send("<h1> Hello from FrontMan</h1>");
+    
 })
 
 //TODO: Route for linkedin

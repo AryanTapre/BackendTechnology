@@ -1,0 +1,186 @@
+#TODO: 
+# link : https://swagger.io/docs/specification/about/
+
+# base information
+openapi: 3.0.0
+info:
+  title: Social App
+  description: a first app for learning backend
+  version: 0.0.1
+
+# global servers
+servers:
+  - url: http://localhost:4000/api/v1               
+    description: a url working on local Machine
+  - url: https://localhost:4000/api/v1
+    description: a URL for dummy, it doesn't work
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+
+paths:
+  /:     # Default Path
+    get: # Http response methods
+      summary: returns a "Hello World" as welcome
+      responses:
+        '200': # Status Code
+          description: Successful operation
+          content:
+            text/html:
+              schema:
+                type: string
+
+  
+  /linkedin:
+    get: # Http response methods
+      summary: returns an Object containing username,followers,follows and date from Instagram account
+      description: get info related to linkedin
+      responses:
+        '200': # Status Code
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  followers:
+                    type: integer
+                    format: int64
+                  follows:
+                    type: integer
+                    format: int64
+                  date:
+                    type: date
+                    format: dd/mm/yy
+                
+                example:
+                  username: "aryan tapre"
+                  followers: 500
+                  follows: 63
+                  date: 12/09/23 - 12:05:09
+
+
+  /facebook:
+    get: # Http response methods
+      summary: returns an Object containing username,followers,follows and date from faceBook account
+      description: get info related to facebook
+      responses:
+        '200': # Status Code
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  followers:
+                    type: integer
+                    format: int64
+                  follows:
+                    type: integer
+                    format: int64
+                  date:
+                    type: date
+                    format: dd/mm/yy
+                
+                example:
+                  username: "aryan tapre"
+                  followers: 500
+                  follows: 63
+                  date: 12/09/23 - 12:05:09
+
+
+  /instagram:
+    get: # Http response methods 
+      summary: returns an Object containing username,followers,follows and date from instagram account
+      description: get info related to instagram
+      responses:
+        '200': # Status Code
+          description: ok
+          content:      # response body
+            application/json: # Media type
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string # data type
+                  followers:
+                    type: integer
+                    format: int64
+                  follows:
+                    type: integer
+                    format: int64
+                  date:
+                    type: date
+                    format: dd/mm/yy
+                
+                example:
+                  username: "aryan tapre"
+                  followers: 500
+                  follows: 63
+                  date: 12/09/23 - 12:05:09
+
+
+  /{token}:
+    get: # Http response methods
+      tags: parameter
+      summary: Return what is in the URL
+      description: get info related to param
+      parameters:
+        - name: token
+          in: path
+          description: user token
+          required: true
+          schema:
+            type: string 
+      responses:
+        '200': # Status Code
+          description: ok
+          content:      # response body
+            application/json: # Media type
+              schema:
+                type: object
+                properties:
+                  parameter:
+                    type: string # data type
+                
+                example:
+                  parameter: "aryan"
+                  
+
+
+
+
+
+
+
+
+
+              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

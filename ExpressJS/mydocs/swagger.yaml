@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: myDocs
+  description: going in Deep swagger Documentation
+  version: 0.0.1
+  contact:
+    email: taprearyan7@gmail.com
+    url: "https://www.aryantapre.in"
+
+# servers:
+#   - url: http://localhost:4000/api/v1
+#     description: for localhost - regular
+#   - url: https://localhost:4000/api/v1
+#     description: for localhost - secure
+
+servers:
+  - url: "{protocols}://localhost:{port}/api/{version}"
+    description: for localhost - regular
+    variables:
+      protocols:
+        default: http
+        enum:
+          - https
+      port:
+        default: 4000
+        enum:
+          - 4001
+          - 4002
+      version:
+        default: v1
+        enum:
+          - v2
+          - v3
+
+  
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apikey
+      in: cookie
+      name: token
+    BearerAuth:
+      type: http
+      scheme: bearer
+  
+
+
+paths:
+  /aryan:
+    get:
+      tags: 
+        - String
+      description: returns a greet message
+      summary: returns a greet message from myDocs
+      responses:
+        '200':
+          description: successfully done
+          content:
+            text/html:
+              schema:
+              type: string
+              example: "hello from me"
+      
+      '400':
+        description: Bad gateway error
+      '500':
+        description: Internal Server Error
+
+  /aryanObject:
+    get:
+      tags:
+        - Object
+      description: returns an Json Object
+      summary: returns an JSON information
+      responses:
+        '200': # status code
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  price:
+                    type: number
+                
+                example:
+                  id: 1000
+                  name: "Robert son"
+                  price: 5699
+  
+  /courses:
+    get:
+      tags:
+        - Arrays
+      description: returns an array of courses
+      summary: returns an array of courses
+      responses:
+        '200': # status code
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
+                    price:
+                      type: number
+                
+                  example:
+                    id: 1000
+                    name: "Robert son"
+                    price: 5699
+
+  
+  /mycourse/{courseID}:
+    get:
+      tags:
+        - Arrays
+      description: return's an required Course corresponding to ID given
+      summary: return's an required Course corresponding to ID given
+      parameters:
+        - name: courseID
+          in: path
+          required: true
+          description: course id
+          default: 101
+          schema:
+            type: string
+        
+      responses:
+        '200':
+          description: all Good Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  price:
+                    type: number
+                  validity:
+                    type: number
+                
+                example:
+                  id: 1024
+                  name: "Social awareness"
+                  price: 100
+                  validity: 365
+        '500':
+          description: internal server Error
+        '400':
+          description: bad gateway
+
+#FIXME: handling post request..
+  /courses/new:
+    post:
+      tags:
+        - Object
+      description: return's an required Course corresponding to ID given
+      summary: return's an required Course corresponding to ID given
+      consumes:
+        - application/json #Media type
+      produces:
+        - application/json #Media type
+
+      requestBody:
+        description: takes object of course
+        required: true
+        content:
+          application/json:  
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+                price:
+                  type: number
+                validity:
+                  type: number
+        
+      responses:
+        '200':
+          description: all Good Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  price:
+                    type: number
+                  validity:
+                    type: number
+                
+                example:
+                  id: 1024
+                  name: "Social awareness"
+                  price: 100
+                  validity: 365
+        '500':
+          description: internal server Error
+        '400':
+          description: bad gateway
+
+
+  /query:
+    get:
+      tags:
+        - String
+      summary: returns location & device being used via accessing the resource
+      description: returns location & device being used via accessing the resource
+      parameters:
+        - name: location
+          in: query
+          required: true
+          description: tells about user's Location
+          schema:
+            type: string
+            enum: [Surat,Vadodara,Bengaluru,Chennai,London]
+        - name: device
+          in: query
+          required: true
+          description: tells about user's device
+          schema:
+            type: string
+            enum: [mobile,web]
+      responses:
+        '200':
+          description: ok All Looks Good
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  location:
+                    type: string
+                  device:
+                    type: string
+                example:
+                  location: "jaipur"
+                  device: "mobile"
+        '500':
+          description: Internal Server ERROR
+        '400':
+          description: Bad Request
+
+  /image:
+    post:
+      tags:
+        - String
+      summary: Uploads an image to the server
+      description: Uploads an image to the server
+      parameters:
+        - name: Auth
+          in: header 
+      requestBody:
+        description: body containing an image 
+        required: true;
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                imageFile:
+                  type: string
+                  format: binary
+
+      responses:
+        '200':
+          description: ok All Looks Good
+          content:
+            text/html:
+              schema:
+                type: string
+                example:
+                  "files are uploaded!"
+        '500':
+          description: Internal Server ERROR
+
+        '400':
+          description: Bad Request
+
+
+
+
+       
+
+
+
+  
+
+
+                  
+
+
+
+ 
+
+
+  
