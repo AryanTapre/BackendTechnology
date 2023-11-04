@@ -115,9 +115,9 @@ app.get("/api/v1/query",(request,response) => {
 });
 
 app.post("/api/v1/image",(request,response) => {
-    console.log(request.headers);
 
     let file = request.files.imageFile;
+    console.log(file);
     let path = __dirname + '/Resource/'+ file.name;    
 
     file.mv(path,(error) => {

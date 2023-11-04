@@ -28,9 +28,22 @@ const userSchema = new mongoose.Schema({
         required: [true,'need country']
     },
     token: {
-        type: String,
+        type: String
     }
 
 });
 
+// userSchema.virtual('fullName').get(() => {
+//     return this.firstname + ' '+ this.lastname;
+// });
+
+// userSchema.virtual('fullName').set((val) => {
+//     let str = val.split(' ');
+//     this.firstname = str[0];
+//     this.lastname = str[1];
+// })
+
 module.exports = mongoose.model('user',userSchema);
+
+
+
