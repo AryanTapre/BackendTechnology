@@ -1,15 +1,15 @@
-const User = require('../models/User')
 const bigPromise = require('./bigPromise')
 const customError = require('../utils/CustomError');
 const jwt = require('jsonwebtoken');
+const User  = require('../models/User');
 
 
-module.exports = bigPromise(async (request,response,next) => {
+exports.userMiddleware = bigPromise(async (request,response,next) => {
 
-    const token = request.header("Authorization").replace("Bearer ","") ||
+    const token =
                   request.cookies.token ||
-                  request.body.token
-
+                  request.header("Authorization").replace("Bearer ","") ||
+                  request.body.token;
 
     if(!token) {
         return next(new customError("you are not LoggedIn","you are not LoggedIn",500));
@@ -17,13 +17,27 @@ module.exports = bigPromise(async (request,response,next) => {
 
         const decode = jwt.verify(token,process.env.JWT_SECRET_KEY);
         if(decode) {
-            const user_id = decode.id;
-            request.userData =  await User.findById(user_id); // Attaching user information
-
+            request.userID = decode.id;
         } else {
             return next(new customError("token expired login again","token expired login again",500));
         }
     }
 
-    next();
+   next();
 })
+
+exports.customRole = (...roles) => {
+    return async(request,response,next) => {
+        const user = await User.findById(request.userID);
+        if(!user) {
+            return next(new customError("user not Registered","user not Registered",500))
+        }
+
+        if(!(roles.includes(user.role))) {
+            return next(new customError(`Access Denied,accessing from non ${roles[0]} account `,
+                `Access Denied,accessing from non ${roles[0]} account `,500));
+        }
+
+        next();
+    }
+}

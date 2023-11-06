@@ -1,7 +1,10 @@
+require('dotenv').config({
+    path: './environmentVariables/.env'
+})
+
 const app = require('./config/app');
 const connectWithDB = require('./config/database');
 const cloudinary = require('cloudinary');
-require('dotenv').config()
 
 connectWithDB(); // connecting with db
 
@@ -15,5 +18,5 @@ cloudinary.v2.config({
 
 
 app.listen(process.env.SERVER_PORT,() => {
-    console.log(`server is up at port:${process.env.SERVER_PORT}`);
+    console.log(`Express:server: is up at port:${process.env.SERVER_PORT}`);
 })

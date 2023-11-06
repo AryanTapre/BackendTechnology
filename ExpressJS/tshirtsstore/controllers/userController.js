@@ -6,6 +6,7 @@ const cloudinary = require('cloudinary');
 const mailHelper = require('../utils/EmailHelper');
 const crypto = require('crypto');
 const {resolveContent} = require("nodemailer/lib/shared");
+const {request} = require("express");
 
 
 const signupOperations =  async (request,response,next) => {
@@ -104,7 +105,6 @@ const forgetPasswordOperation = async (request,response,next) => {
             message
         })
 
-        
     } catch (error) {
         user.forgetPasswordToken = undefined
         user.forgetPasswordExpiry= undefined;
@@ -137,7 +137,7 @@ const passwordReset = async(request,response,next) => {
         return next(new CustomError("invalid or expired token","invalid or expired token",500));
     } else {
 
-        if(password != confirmPassword) {
+        if(password !== confirmPassword) {
             return next(new CustomError("password and confirm password does not Match!","password and confirm password does not Match!",500));
 
         }else {
@@ -156,18 +156,154 @@ const passwordReset = async(request,response,next) => {
     }
 }
 
-const userDashboard = (request,response,next) => {
-    const data = {
-        username: request.userData.name,
-        profile_pic: request.userData.photo.secure_url
-    }
+const userDashboard = async (request,response,next) => {
+    const user = await User.findById(request.userID);
+    const data = new Object({
+        username: user.name,
+        photo: user.photo.secure_url
+    })
 
     response.status(200).json(data);
 }
 
+const changePassword = async (request,response,next) => {
+
+    const user = await User.findById(request.userID).select("+password");
+    const oldPassword = request.body.oldPassword;
+    const newPassword = request.body.newPassword;
+
+    if(!(oldPassword && newPassword)) {
+        return next(new CustomError("oldpassword and new password are Required fields","oldpassword and new password are Required fields",500));
+    }
+
+    if(oldPassword === newPassword) {
+        return next(new CustomError("old and New Password can't be Same","old and New Password can't be Same",500));
+    }
+
+    const status = await user.isValidatePassword(oldPassword)
+    if(!status) {
+        return next(new CustomError("old password is incorrect","old password is incorrect",500));
+    }
+
+    //update Old password with a New one
+    user.password = newPassword;
+    await user.save();
+
+    cookieToken(user,response)
+}
+
+const selectDataToUpdate = (...data) => {
+
+    let values = [];
+    for(let n of data) {
+        if(n.data) {
+            values.push(n.type);
+        }
+    }
+    return values;
+}
+
+const updateUser = async (request,response,next) => {
+    // we are updating Name,Email and Photo
+
+    const data = [
+        { type: "name",
+        data:request.body.name},
+        {type: "email",
+        data: request.body.email},
+        {type: "photo",
+        data: request.files?request.files.photo:undefined}
+    ]
+
+
+    const selectedData = selectDataToUpdate(...data);
+    console.log(selectedData)
+    let updateUserData = {};
+
+    for(const d of selectedData) {
+        switch (d) {
+            case 'name':
+                updateUserData.name = request.body.name;
+                console.log("one:",updateUserData);
+                break;
+
+            case 'email':
+                updateUserData.email = request.body.email;
+                console.log("two:",updateUserData);
+                break;
+
+            case 'photo':
+                const updatePhoto = request.files.photo;
+                const user = await User.findById(request.userID);
+                const status = await cloudinary.v2.uploader.destroy(user.photo.id);
+                if(!status) return next(new CustomError("failed to delete photo from Cloudinary","failed to delete photo from Cloudinary",500));
+
+                const cloudinaryOptions = {
+                    folder:"Users",
+                    crop: "scale"
+                }
+
+                const cloudinaryResult = await cloudinary.v2.uploader.upload(updatePhoto.tempFilePath,cloudinaryOptions);
+                if(cloudinaryResult) {
+                    updateUserData.photo = {
+                        id:cloudinaryResult.public_id,
+                        secure_url: cloudinaryResult.secure_url
+                    }
+                }
+
+                break;
+
+            default:
+                break;
+
+        }
+    }
+
+    console.log("four:",updateUserData);
+
+    let updatedData;
+    try{
+        updatedData = await User.findOneAndUpdate({_id: request.userID},updateUserData,{
+            new: true,
+            runValidators: true
+        })
+
+    }catch (error) {
+        console.log("error while updating data on database server:",new CustomError(error,error,500));
+        return response.status(501).json({
+            success: false,message:"error while updating data on database server"
+        })
+    }
+
+    response.status(201).json({
+        success: true,
+        message: "data Updated successfully",
+        updatedData
+    })
+
+}
+
+const adminAllUsers = async (request,response,next) => {
+    const users = await User.find({role:"user"});
+    if(!users) {
+        return response.status(500).send("no user exists").json({
+            success: false,
+            message: "no user exists"
+        })
+    }
+
+    response.status(201).json({
+        success: true,
+        users
+    })
+}
+
+exports.adminAllUsers = bigPromise(adminAllUsers);
+exports.updateUser = bigPromise(updateUser);
 exports.passwordReset = bigPromise(passwordReset);
 exports.forgetPassword = bigPromise(forgetPasswordOperation);
 exports.signup = bigPromise(signupOperations);
 exports.login = bigPromise(loginOperations);
 exports.logout = bigPromise(logoutOperation);
 exports.userDashboard = bigPromise(userDashboard);
+exports.changePassword = bigPromise(changePassword);

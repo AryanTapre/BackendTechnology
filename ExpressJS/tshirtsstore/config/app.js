@@ -1,7 +1,12 @@
+//require('dotenv').config();
+
+require('dotenv').config({
+    path: './environmentVariables/.env'
+})
+
 const express = require('express');
 const app = express();
 
-require('dotenv').config();
 const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
@@ -41,9 +46,11 @@ const {
         loginRouter,
         forgetPasswordRouter,
         passwordResetRouter,
-        dashboardRouter
-
-      } = require('../routes/user');
+        dashboardRouter,
+        changePasswordRouter,
+        userUpdateRouter,
+        adminAllUserRouter
+} = require('../routes/user');
 
 
 // const login = require("../routes/login");
@@ -63,6 +70,9 @@ app.use('/api/v1/',logoutRouter);
 app.use('/api/v1/',forgetPasswordRouter);
 app.use('/api/v1/',passwordResetRouter);
 app.use('/api/v1/',dashboardRouter);
+app.use('/api/v1/',changePasswordRouter);
+app.use('/api/v1/',userUpdateRouter);
+app.use('/api/v1/',adminAllUserRouter);
 
 app.get("/signup",(request,response) => {
     response.render("signup")
