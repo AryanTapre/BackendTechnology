@@ -29,7 +29,6 @@ const signupOperations =  async (request,response,next) => {
         return next(new CustomError("name,email & password are required!","not available these fields",400) )
     }
     else {
-
         const user = await User.create({
             name, 
             email, 
@@ -284,12 +283,15 @@ const updateUser = async (request,response,next) => {
 }
 
 const adminAllUsers = async (request,response,next) => {
-    const users = await User.find({role:"user"});
+    const users = await User.find({    // Selects all the documents except the "admin"
+        role: {
+            $ne:"admin"
+        }});
+
     if(!users) {
         return response.status(500).send("no user exists").json({
             success: false,
-            message: "no user exists"
-        })
+            message: "no user exists"})
     }
 
     response.status(201).json({
@@ -298,6 +300,118 @@ const adminAllUsers = async (request,response,next) => {
     })
 }
 
+//TODO: FETCH ALL DOCUMENTS EXCEPT ADMIN & MANAGER
+const managerAllUsers = async (request,response,next) => {
+    const user = await User.find({role:{$nin:["admin","manager"]}});
+    if(!user) {
+        return response.status(500).send("no user exists").json({
+            success: false,
+            message: "no user exists"
+        })
+    }
+
+    response.status(201).json({
+        success: true,
+        user
+    })
+}
+
+const adminGetUser = async (request,response,next) => {
+    const user = await User.findById(request.params.id);
+    if(!user) {
+        console.log("invalid user ID")
+        return next(response.status(401).json({
+            message: "invalid user ID",
+            error: new CustomError("invalid user id","invalid user id",400)
+        }));
+    }
+
+    response.status(200).json({
+        success: true,
+        user
+    })
+}
+
+//TODO: WE CHANGING ROLE OF USER ONLY FROM ADMIN SIDE....
+const adminUpdateUser = async (request,response,next) => {
+    const newRole = "clerk"; // admin will select from control panel
+    const data = {
+        role: newRole
+    }
+    let updatedData;
+
+    try {
+        updatedData = await User.findOneAndUpdate({_id: request.params.id},data,{
+            new: true,
+            runValidators: true})
+    }
+    catch (error) {
+        console.log("error while updating data on database server:",new CustomError(error,error,500));
+         return next(response.status(501).json({
+             success: false,error: new CustomError("error while updating data on database server","error while updating data on database server",401)
+         }))
+    }
+
+    response.status(201).json({
+        success: true,
+        message: "data updated Successfully",
+        updatedData
+    })
+}
+
+const adminDeleteUser = async (request,response,next) => {
+    const userID = request.params.id;
+
+    if(!userID) {
+        console.log(new CustomError("userid is not available","userid is not avaliable",401));
+        return next(response.status(401).json({
+            status: false,
+            message: "userid is not available"}))
+
+    } else {
+        const user = await User.findById(userID);
+        if(!user) {
+            console.log(new CustomError("user does not Exists!","user does not Exists!",500));
+            return next(response.status(500).json({
+                success: false,
+                error: new CustomError("user does not Exists!","user does not Exists!",500)}))
+        }
+
+        if(user.photo.id) {
+            const cloudinaryStatus = await cloudinary.v2.uploader.destroy(user.photo.id);
+            if(!cloudinaryStatus) {
+                console.log(new CustomError("failed to delete photo from Cloudinary!","failed to delete photo from Cloudinary!",500));
+                return next(response.status(500).json({
+                    success: false,
+                    message: new CustomError("failed to delete photo from Cloudinary!","failed to delete photo from Cloudinary!",500)}))
+            }
+        }
+
+        let userDeleted;
+        try{
+            userDeleted = await User.findOneAndDelete(userID,{
+                new:true,
+                runValidators: true})
+        }
+        catch (error) {
+            console.log(new CustomError(`error while deleting user: ${error}`,`error while deleting user: ${error}`,501));
+            return next(response.status(500).json({
+                success: false,
+                message: new CustomError(`error while deleting user: ${error}`,`error while deleting user: ${error}`,501)
+            }))
+        }
+
+        response.status(200).json({
+            success: true,
+            message:"user deleted successfully",
+            userDeleted
+        })
+    }
+}
+
+exports.adminDeleteUser = bigPromise(adminDeleteUser);
+exports.adminUpdateUser = bigPromise(adminUpdateUser);
+exports.adminGetUser = bigPromise(adminGetUser);
 exports.adminAllUsers = bigPromise(adminAllUsers);
 exports.updateUser = bigPromise(updateUser);
 exports.passwordReset = bigPromise(passwordReset);
@@ -307,3 +421,4 @@ exports.login = bigPromise(loginOperations);
 exports.logout = bigPromise(logoutOperation);
 exports.userDashboard = bigPromise(userDashboard);
 exports.changePassword = bigPromise(changePassword);
+exports.managerAllUsers = bigPromise(managerAllUsers);

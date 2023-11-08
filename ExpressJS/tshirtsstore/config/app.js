@@ -49,7 +49,9 @@ const {
         dashboardRouter,
         changePasswordRouter,
         userUpdateRouter,
-        adminAllUserRouter
+        adminAllUserRouter,
+        managerAllUserRouter,
+        adminUserRouter
 } = require('../routes/user');
 
 
@@ -73,6 +75,8 @@ app.use('/api/v1/',dashboardRouter);
 app.use('/api/v1/',changePasswordRouter);
 app.use('/api/v1/',userUpdateRouter);
 app.use('/api/v1/',adminAllUserRouter);
+app.use('/api/v1/',managerAllUserRouter);
+app.use('/api/v1',adminUserRouter)
 
 app.get("/signup",(request,response) => {
     response.render("signup")

@@ -4,6 +4,7 @@ const  express = require("express");
 const app = express();
 
 const DB_NAME = require("../constants")
+const {reject} = require("nodemailer/.ncurc");
 
 //TODO: PROFESSIONAL METHOD TO CONNECT WITH DATABASE
 const connectWithDB = async () => {
@@ -22,7 +23,7 @@ const connectWithDB = async () => {
             port:${connectionInstance.connection.port} 
             name:${connectionInstance.connection.name}
         `);
-      
+
     }
     catch (e) {
         console.log(`FAILED TO CONNECT WITH MONGODB: ${e}`)
