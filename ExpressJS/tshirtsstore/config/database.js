@@ -4,7 +4,7 @@ const  express = require("express");
 const app = express();
 
 const DB_NAME = require("../constants")
-const {reject} = require("nodemailer/.ncurc");
+
 
 //TODO: PROFESSIONAL METHOD TO CONNECT WITH DATABASE
 const connectWithDB = async () => {

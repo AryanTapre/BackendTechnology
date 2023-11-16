@@ -55,16 +55,13 @@ const {
 } = require('../routes/user');
 
 
-// const login = require("../routes/login");
-// const signup = require("../routes/signup");
-// const logout = require("../routes/logout");
+const {productRouter} = require('../routes/product')
+
+
 
 
 // FIXME: middlewares for routes
-// app.use('/api/v1/',home);
-// app.use('/api/v1/',signup);
-// app.use('/api/v1/',login);
-// app.use('/api/v1/',logout);
+//user Routes
 app.use('/api/v1',home);
 app.use('/api/v1/',loginRouter);
 app.use('/api/v1/',signupRouter);
@@ -77,6 +74,11 @@ app.use('/api/v1/',userUpdateRouter);
 app.use('/api/v1/',adminAllUserRouter);
 app.use('/api/v1/',managerAllUserRouter);
 app.use('/api/v1',adminUserRouter)
+
+
+//Product Routes
+app.use('/api/v1/',productRouter);
+
 
 app.get("/signup",(request,response) => {
     response.render("signup")

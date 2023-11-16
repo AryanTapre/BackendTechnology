@@ -92,7 +92,8 @@ const forgetPasswordOperation = async (request,response,next) => {
     }
 
     const forgetToken = user.getForgetPasswordToken(); // generating forget token
-    await user.save({validateBeforeSave: false}) // saving to the database....
+    await user.save({validateBeforeSave: false}) // saving to the databaseMedia....
+    
     const forgetPasswordURL = `${request.protocol}://${request.get("host")}/api/v1/password/reset/${forgetToken}`;
 
     const message = `paste the above link to any browser address bar \n\n link:${forgetPasswordURL}`;
@@ -268,9 +269,9 @@ const updateUser = async (request,response,next) => {
         })
 
     }catch (error) {
-        console.log("error while updating data on database server:",new CustomError(error,error,500));
+        console.log("error while updating data on databaseMedia server:",new CustomError(error,error,500));
         return response.status(501).json({
-            success: false,message:"error while updating data on database server"
+            success: false,message:"error while updating data on databaseMedia server"
         })
     }
 
@@ -346,9 +347,9 @@ const adminUpdateUser = async (request,response,next) => {
             runValidators: true})
     }
     catch (error) {
-        console.log("error while updating data on database server:",new CustomError(error,error,500));
+        console.log("error while updating data on databaseMedia server:",new CustomError(error,error,500));
          return next(response.status(501).json({
-             success: false,error: new CustomError("error while updating data on database server","error while updating data on database server",401)
+             success: false,error: new CustomError("error while updating data on databaseMedia server","error while updating data on databaseMedia server",401)
          }))
     }
 

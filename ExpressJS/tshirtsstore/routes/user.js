@@ -1,4 +1,3 @@
-
 //importing middlewares
 const {userMiddleware,customRole} = require('../middlewares/user');
 
@@ -20,19 +19,19 @@ const adminUserRouter = express.Router();
 
 
 const {
-        logout,
-        login,
-        signup,
-        forgetPassword,
-        passwordReset,
-        userDashboard,
-        changePassword,
-        updateUser,
-        adminAllUsers,
-        managerAllUsers,
-        adminGetUser,
-        adminUpdateUser,
-        adminDeleteUser
+    logout,
+    login,
+    signup,
+    forgetPassword,
+    passwordReset,
+    userDashboard,
+    changePassword,
+    updateUser,
+    adminAllUsers,
+    managerAllUsers,
+    adminGetUser,
+    adminUpdateUser,
+    adminDeleteUser
 } = require('../controllers/userController');
 
 loginRouter.route("/login").post(login);
@@ -72,5 +71,3 @@ module.exports = {
     managerAllUserRouter,
     adminUserRouter
 }
-
-
