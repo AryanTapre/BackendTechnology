@@ -11,7 +11,7 @@ connectWithDB().then(()=> {
     app.listen(process.env.SERVER_PORT,() => {
         console.log(`Express:server: is up at port:${process.env.SERVER_PORT}`);
     })
-}).catch(() => {
+}).catch((error) => {
         console.error("MOngoDB connection Failed!!!",error);
 })
 

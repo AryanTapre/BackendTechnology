@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema({
             values: [
                 "nothing",
                 "sleeves",
-                "half-sleeves",
+                "halfsleeves",
                 "hoodies",
                 "collarless"
             ],
