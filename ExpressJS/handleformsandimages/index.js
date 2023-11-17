@@ -79,7 +79,7 @@ app.post("/mypost",async(req,res) => {
     const data = new Object({
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        samplefile: req.files.samplefile,
+        samplefile: files,
         result,
         imageArray
     });
