@@ -308,7 +308,7 @@ const adminDeleteProduct = async (request,response,next) => {
             const asset = _productStatus.photos[index];
            try{
                 await cloudinary.uploader.destroy(asset.id);
-                const len = asset.secure_url.length-4;
+                const len = asset.secure_url.length-4; // getting format for file(.jpeg/.png/.avg)
                 const fileExtension = asset.secure_url.slice(len,asset.secure_url.length);
 
 
@@ -352,7 +352,155 @@ const adminDeleteProduct = async (request,response,next) => {
     }
 }
 
+const selectDataToUpdate = (...data) => {
+    let values = [];
+    for (const dataKey of data) {
+        if(dataKey.data) {
+            values.push(dataKey.type);
+        }
+    }
+    console.log("values:",values);
 
+    return values;
+}
+const addReview = async (request,response,next) => {
+    const productID = request.params.id ? request.params.id : undefined;
+
+    if(productID) {
+        const product = await Product.findById(productID);
+        if(!product) {
+            console.log("ISSUE RAISE : productID invalid")
+            next(response.status(401).json({
+                success: false,
+                message:new CustomError("productID invalid","productID invalid",401)}))
+        }
+
+       const alreadyReviewed = product.reviews.find(
+           (element) => {
+               return element.user.toString() === request.userID.toString()
+           }
+       )
+
+        if(alreadyReviewed) {
+
+            const data = [
+                {type: "rating",
+                    data: request.body.rating},
+                {type: "comment",
+                    data: request.body.comment}
+            ]
+
+            const selectedData = selectDataToUpdate(...data);
+            console.log(`selectedData:`,selectedData)
+
+            product.reviews.forEach((review) => {
+                if(review.user.toString() === request.userID.toString()) {
+                    for (const data of selectedData) {
+                        console.log(`${data}:`,request.body[data]);
+                        review[data] = request.body[data];
+                    }
+                }
+            })
+
+        } else {
+
+            const user = await User.findById(request.userID);
+            const userRating = request.body.rating;
+            const userComment = request.body.comment;
+            const userName = user.name;
+
+            let info = {   user:request.userID,
+                                 name: userName,
+                                 rating: Number(userRating),
+                                 comment: userComment }
+
+            product.reviews.push(info);
+            product.numberOfReview = product.reviews.length;
+        }
+
+        //calculating overall rating of Product....
+        product.rating = product.reviews.reduce((accumulator,current) => {
+            return current.rating + accumulator
+        },0) / product.reviews.length;
+
+       try{
+           await  product.save({
+               validateBeforeSave: false
+           })
+       }
+       catch(error) {
+           console.log(`failed to save review to database:${error}`)
+           next(response.status(501).json({
+               success: false,
+               message:`failed to save review to database:${error}`
+           }))
+       }
+        console.log("review added successfully for userID:",request.userID)
+        response.status(201).json({
+            success: true,
+            message :"review added successfully"
+        })
+    }
+
+}
+
+
+const deleteReview = async (request,response,next) => {
+    const productID = request.params.id ? request.params.id : undefined;
+
+    if(productID) {
+        const product = await Product.findById(productID);
+        if (!product) {
+            console.log("ISSUE RAISE : productID invalid")
+            next(response.status(401).json({
+                success: false,
+                message: new CustomError("productID invalid", "productID invalid", 401)}))
+        }
+
+        const userReview = product.reviews.filter((element,index) => {
+            if(element.user.toString() === request.userID.toString()) {
+                element.index = index;
+                return element;
+            }
+        })
+
+        console.log("user review:",userReview);
+
+        if(userReview.length >= 1) {
+            product.numberOfReview = product.reviews.length - 1;
+
+            product.reviews.splice(userReview[0].index, 1); // deleting review
+
+            if(product.reviews.length >= 1) {
+                product.rating = product.reviews.reduce((accumulator,current) => {return current.rating + accumulator},0) / product.reviews.length
+            } else {
+                product.rating = 0;
+            }
+
+
+            await product.save({
+                validateBeforeSave: false
+            })
+
+            console.log("review deleted successfully reviewID:",userReview[0]._id);
+            response.status(201).json({
+                success: true,
+                message: "review deleted successfully"
+            })
+        }
+        else {
+            console.log("review not exist for userID:",request.userID);
+            response.status(401).json({
+                success: false,
+                message: "review not exist"
+            })
+        }
+
+    }
+}
+
+exports.deleteReview = bigPromise(deleteReview)
+exports.addReview = bigPromise(addReview)
 exports.adminDeleteProduct = bigPromise(adminDeleteProduct)
 exports.adminUpdateProduct = bigPromise(adminUpdateProduct)
 exports.getOneProduct = bigPromise(getOneProduct);

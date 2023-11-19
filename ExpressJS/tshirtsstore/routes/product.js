@@ -9,12 +9,16 @@ const {
     adminGetProduct,
     getOneProduct,
     adminUpdateProduct,
-    adminDeleteProduct
+    adminDeleteProduct,
+    addReview,
+    deleteReview
 } = require('../controllers/productController')
 
 
 productRouter.route("/get/product").get(getProductDetails)
 productRouter.route("/get/product/:id").get(getOneProduct)
+productRouter.route("/product/review/:id").post(userMiddleware,addReview)
+productRouter.route("/product/review/delete/:id").delete(userMiddleware,deleteReview)
 
 
 //TODO: ADMIN routes

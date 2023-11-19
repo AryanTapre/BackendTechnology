@@ -5,6 +5,7 @@ require('dotenv').config({
 })
 
 const express = require('express');
+const axios = require('axios');
 const app = express();
 
 const morgan = require('morgan');
@@ -57,6 +58,7 @@ const {
 
 const {productRouter} = require('../routes/product')
 
+const {paymentRouter} = require('../routes/payment')
 
 
 
@@ -79,6 +81,11 @@ app.use('/api/v1',adminUserRouter)
 //Product Routes
 app.use('/api/v1/',productRouter);
 
+//Payment Routes
+app.use('/api/v1',paymentRouter);
+
+
+
 
 app.get("/signup",(request,response) => {
     response.render("signup")
@@ -87,6 +94,14 @@ app.get("/signup",(request,response) => {
 app.get("/login",(request,response) => {
     response.render("login");
 })
+
+app.get("/checkout",async(request,response) => {
+    const result = await axios.get("http://localhost:5000/api/v1/get/product/655763bb47d0f0a93dddafd1");
+    console.log(result.data);
+    response.render("checkout",{productData:result.data.productInformation});
+})
+
+
 
 //TODO: Exporting app
 module.exports = app;

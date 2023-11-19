@@ -62,7 +62,7 @@ const productSchema = new mongoose.Schema({
         default: 0
     },
 
-    numberOfRating: {
+    numberOfReview: {
         type: Number,
         enum: {
             values: [
