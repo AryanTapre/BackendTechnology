@@ -57,8 +57,8 @@ const {
 
 
 const {productRouter} = require('../routes/product')
-
 const {paymentRouter} = require('../routes/payment')
+const {orderRouter} = require('../routes/order')
 
 
 
@@ -84,7 +84,8 @@ app.use('/api/v1/',productRouter);
 //Payment Routes
 app.use('/api/v1',paymentRouter);
 
-
+//Order routers
+app.use('/api/v1',orderRouter);
 
 
 app.get("/signup",(request,response) => {

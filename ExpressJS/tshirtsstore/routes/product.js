@@ -25,6 +25,6 @@ productRouter.route("/product/review/delete/:id").delete(userMiddleware,deleteRe
 productRouter.route("/admin/newproduct").post(userMiddleware,customRole('admin'),adminnewProduct);
 productRouter.route("/admin/get/product").get(userMiddleware,customRole('admin'),adminGetProduct)
 productRouter.route("/admin/update/product/:id").post(userMiddleware,customRole('admin'),adminUpdateProduct)
-productRouter.route("/admin/delete/product/:id").get(userMiddleware,customRole('admin'),adminDeleteProduct)
+productRouter.route("/admin/delete/product/:id").delete(userMiddleware,customRole('admin'),adminDeleteProduct)
 
 module.exports = {productRouter}

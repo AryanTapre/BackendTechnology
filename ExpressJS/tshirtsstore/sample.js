@@ -29,3 +29,6 @@ const isValidatePassword = (Password) => {
 }
 
 console.log(isValidatePassword(Password));
+
+
+const obj = 

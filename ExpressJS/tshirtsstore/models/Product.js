@@ -97,7 +97,7 @@ const productSchema = new mongoose.Schema({
         }
     ],
 
-    user: {
+    user: { // the one who added this product can be manager,admin and etc
         type: mongoose.Schema.ObjectId,
         ref: "User",
         required: true
