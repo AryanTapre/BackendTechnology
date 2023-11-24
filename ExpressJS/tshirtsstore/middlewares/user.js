@@ -3,6 +3,15 @@ const customError = require('../utils/CustomError');
 const jwt = require('jsonwebtoken');
 const User  = require('../models/User');
 
+exports.isGoogleAuthenticate = bigPromise((request,response,next) => {
+    const isSession = request.session.emailID ? request.session.emailID : undefined ;
+    if(!isSession) {
+        console.log("session not found:")
+        response.redirect("/home")
+    }
+    console.log("session found!");
+    next();
+})
 
 exports.userMiddleware = bigPromise(async (request,response,next) => {
 

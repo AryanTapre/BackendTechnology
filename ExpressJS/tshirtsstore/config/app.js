@@ -15,6 +15,23 @@ const swaggerUI = require('swagger-ui-express');
 const yaml = require('yamljs');
 const fileSystem = require('fs');
 
+const passport = require('passport');
+const googlePassportConfig = require('../passport/googlePassport')
+const facebookPassportConfig = require('../passport/facebookPassport');
+
+const session = require('express-session');
+
+app.use(session({
+    secret: "helloThisSecret",
+    cookie: {
+        maxAge: 60000
+    }
+}))
+
+// middleware for passport settings....
+app.use(passport.initialize(googlePassportConfig));
+app.use(passport.initialize(facebookPassportConfig))
+
 //morgan middleware
 app.use(morgan('tiny'));
 
@@ -40,7 +57,7 @@ app.set("view engine",'ejs');
 
 
 //FIXME: importing routes
-const home = require("../routes/home");
+const {homeRouter} = require("../routes/home");
 const {
         logoutRouter,
         signupRouter,
@@ -52,7 +69,11 @@ const {
         userUpdateRouter,
         adminAllUserRouter,
         managerAllUserRouter,
-        adminUserRouter
+        adminUserRouter,
+        googleLoginRouter,
+        facebookLoginRouter,
+        googleCallbackHandlerRouter,
+        facebookCallbackHandlerRouter
 } = require('../routes/user');
 
 
@@ -64,7 +85,7 @@ const {orderRouter} = require('../routes/order')
 
 // FIXME: middlewares for routes
 //user Routes
-app.use('/api/v1',home);
+app.use(homeRouter);
 app.use('/api/v1/',loginRouter);
 app.use('/api/v1/',signupRouter);
 app.use('/api/v1/',logoutRouter);
@@ -86,6 +107,18 @@ app.use('/api/v1',paymentRouter);
 
 //Order routers
 app.use('/api/v1',orderRouter);
+
+// google login router
+app.use('/api/v1',googleLoginRouter)
+
+// google callback handler
+app.use('/api/v1',googleCallbackHandlerRouter)
+
+//facebook login router
+app.use('/api/v1',facebookLoginRouter);
+
+//facebook callback hander
+app.use('/api/v1',facebookCallbackHandlerRouter)
 
 
 app.get("/signup",(request,response) => {

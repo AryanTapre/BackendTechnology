@@ -5,8 +5,28 @@ const cookieToken = require('../utils/UserCookieToken');
 const cloudinary = require('cloudinary');
 const mailHelper = require('../utils/EmailHelper');
 const crypto = require('crypto');
-const {resolveContent} = require("nodemailer/lib/shared");
-const {request} = require("express");
+const passport = require('passport')
+
+
+const googleLogin = (request,response,next) => {
+    response.send("login with Google");
+}
+
+const facebookLogin = (request,response,next) => {
+    response.send("Facebook login here")
+}
+
+const googleCallbackHandler = (request,response,next) => {
+    console.log("Google session is : ",request.session);
+    request.session.emailID = request.session.passport.user.email;
+
+    response.send(request.session);
+}
+
+const facebookCallbackHandler = (request,response,next) => {
+    console.log("Facebook session : ",request.session);
+    response.send(request.session);
+}
 
 
 const signupOperations =  async (request,response,next) => {
@@ -410,6 +430,10 @@ const adminDeleteUser = async (request,response,next) => {
     }
 }
 
+exports.facebookCallbackHandler = bigPromise(facebookCallbackHandler);
+exports.googleCallbackHandler = bigPromise(googleCallbackHandler);
+exports.facebookLogin = bigPromise(facebookLogin);
+exports.googleLogin = bigPromise(googleLogin);
 exports.adminDeleteUser = bigPromise(adminDeleteUser);
 exports.adminUpdateUser = bigPromise(adminUpdateUser);
 exports.adminGetUser = bigPromise(adminGetUser);

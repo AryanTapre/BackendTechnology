@@ -1,6 +1,7 @@
 //importing middlewares
-const {userMiddleware,customRole} = require('../middlewares/user');
-
+const {userMiddleware,customRole,isGoogleAuthenticate} = require('../middlewares/user');
+const {googleAuthenticate,facebookAuthenticate} = require('../middlewares/passport')
+const passport = require('passport');
 
 
 const express = require('express');
@@ -15,6 +16,10 @@ const userUpdateRouter = express.Router();
 const adminAllUserRouter = express.Router();
 const managerAllUserRouter = express.Router();
 const adminUserRouter = express.Router();
+const googleLoginRouter = express.Router();
+const facebookLoginRouter = express.Router();
+const googleCallbackHandlerRouter = express.Router();
+const facebookCallbackHandlerRouter = express.Router();
 
 
 
@@ -31,10 +36,23 @@ const {
     managerAllUsers,
     adminGetUser,
     adminUpdateUser,
-    adminDeleteUser
+    adminDeleteUser,
+    googleLogin,
+    facebookLogin,
+    googleCallbackHandler,
+    facebookCallbackHandler
 } = require('../controllers/userController');
 
+// TODO: login routes
 loginRouter.route("/login").post(login);
+
+googleLoginRouter.route("/login/auth/google").get(googleAuthenticate,googleLogin);
+googleCallbackHandlerRouter.route("/auth/google/callback").get(passport.authenticate('google'),googleCallbackHandler);
+
+facebookLoginRouter.route("/login/auth/facebook").get(facebookAuthenticate,facebookLogin);
+facebookCallbackHandlerRouter.route("/auth/facebook/callback").get(passport.authenticate('facebook'),facebookCallbackHandler)
+
+
 signupRouter.route("/signup").post(signup);
 logoutRouter.route("/logout").get(logout);
 forgetPasswordRouter.route("/forgetpassword").post(forgetPassword);
@@ -69,5 +87,9 @@ module.exports = {
     userUpdateRouter,
     adminAllUserRouter,
     managerAllUserRouter,
-    adminUserRouter
+    adminUserRouter,
+    googleLoginRouter,
+    facebookLoginRouter,
+    googleCallbackHandlerRouter,
+    facebookCallbackHandlerRouter
 }

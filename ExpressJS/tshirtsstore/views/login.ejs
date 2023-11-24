@@ -8,10 +8,10 @@
 </head>
 <body class="bg-dark text-white mt-4 col-4 offset-4">
     <div class="container">
-        <h1> Login</h1>  
+        <h1> Login</h1>
 
         <form method="post" action="/api/v1/login" enctype="multipart/form-data">
-           
+
             <div class="mb-3">
               <label for="email" class="form-label">email</label>
               <input type="email" name="email" class="form-control" id="email">
@@ -20,8 +20,10 @@
               <label for="password" class="form-label">password</label>
               <input type="password" name="password" class="form-control" id="password">
             </div>
-            
-            <button type="submit" class="btn btn-primary">Submit</button>
+
+            <button type="submit" class="btn btn-primary">Submit</button> &nbsp;
+            <a type="button" class="btn btn-danger" href="api/v1/login/auth/google">login with Google</a>
+            <a type="button" class="btn btn-info" href="api/v1/login/auth/facebook">login with Facebook</a>
           </form>
         </div>
       </body>
